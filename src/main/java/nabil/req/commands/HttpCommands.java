@@ -1,5 +1,6 @@
 package nabil.req.commands;
 
+import nabil.req.domain.AppHttpResponse;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpMethod;
@@ -7,10 +8,10 @@ import org.springframework.http.MediaType;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
-import java.util.stream.Collectors;
 
 /**
  * @author Ahmed Nabil
@@ -23,29 +24,58 @@ public class HttpCommands {
         this.webClient = webClient;
     }
 
-    @ShellMethod(key = "req", prefix = "-")
-    public String request(
-            @ShellOption(value = "p", defaultValue = "https://example.com/") String uri,
-            @ShellOption(value = "X", defaultValue = "GET") String verb
+    @ShellMethod(key = "req", prefix = "-", value = "sends an http request")
+    public AppHttpResponse request(
+            @ShellOption(help = "uri of the request", value = "L", defaultValue = "localhost") String uri,
+            @ShellOption(help = "http verb {GET,POST,PUT,DELETE}", value = "X", defaultValue = "GET") String verb
     ) {
-        return this.webClient.method(HttpMethod.valueOf(verb))
+        ClientResponse response = this.webClient.method(HttpMethod.valueOf(verb))
                 .uri(uri)
                 .accept(MediaType.ALL)
-                .exchangeToFlux(response -> response.bodyToFlux(DataBuffer.class))
-                .map(dataBuffer -> {
+                .exchange()
+                .block();
+        return extractAppHttpResponse(response);
+    }
+
+    @ShellMethod(key = "get", prefix = "-")
+    public AppHttpResponse get(
+            @ShellOption(help = "uri of the request", value = "L") String uri
+    ) {
+       return request(uri, "GET");
+    }
+
+    @ShellMethod(key = "post", prefix = "-")
+    public AppHttpResponse post(
+            @ShellOption(help = "uri of the request", value = "L") String uri,
+            @ShellOption(help = "body of the post request", value = "B") String body
+    ) {
+        ClientResponse response = this.webClient.method(HttpMethod.valueOf("POST"))
+                .uri(uri)
+                .bodyValue(body)
+                .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .exchange()
+                .block();
+        return extractAppHttpResponse(response);
+    }
+
+    @ShellMethod(key = "del", prefix = "-")
+    public AppHttpResponse delete(
+            @ShellOption(help = "uri of the request", value = "L") String uri
+    ) {
+        return request(uri, "DELETE");
+    }
+
+    private AppHttpResponse extractAppHttpResponse(ClientResponse response) {
+        assert response != null;
+        return new AppHttpResponse(
+                response.statusCode().toString(),
+                response.headers().asHttpHeaders().toSingleValueMap(),
+                response.bodyToMono(DataBuffer.class).map(dataBuffer -> {
                     byte[] bytes = new byte[dataBuffer.readableByteCount()];
                     dataBuffer.read(bytes);
                     DataBufferUtils.release(dataBuffer);
                     return new String(bytes, StandardCharsets.UTF_8);
-                })
-                .collect(Collectors.joining())
-                .block();
-    }
-
-    @ShellMethod(key = "get", prefix = "-")
-    public String get(
-            @ShellOption(value = "X", defaultValue = "https://example.com/") String uri
-    ) {
-       return request(uri, "GET");
+                }).block()
+        );
     }
 }
