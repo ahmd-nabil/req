@@ -58,6 +58,20 @@ public class HttpCommands {
         return extractAppHttpResponse(response);
     }
 
+    @ShellMethod(key = "put", prefix = "-")
+    public AppHttpResponse put(
+            @ShellOption(help = "uri of the request", value = "L") String uri,
+            @ShellOption(help = "body of the post request", value = "B") String body
+    ) {
+        ClientResponse response = this.webClient.method(HttpMethod.valueOf("PUT"))
+                .uri(uri)
+                .bodyValue(body)
+                .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .exchange()
+                .block();
+        return extractAppHttpResponse(response);
+    }
+
     @ShellMethod(key = "del", prefix = "-")
     public AppHttpResponse delete(
             @ShellOption(help = "uri of the request", value = "L") String uri
