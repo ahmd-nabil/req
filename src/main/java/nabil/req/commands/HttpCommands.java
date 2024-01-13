@@ -3,15 +3,20 @@ package nabil.req.commands;
 import nabil.req.domain.AppHttpResponse;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * @author Ahmed Nabil
@@ -26,21 +31,19 @@ public class HttpCommands {
 
     @ShellMethod(key = "req", prefix = "-", value = "sends an http request")
     public AppHttpResponse request(
-            @ShellOption(help = "uri of the request", value = "L", defaultValue = "localhost") String uri,
-            @ShellOption(help = "http verb {GET,POST,PUT,DELETE}", value = "X", defaultValue = "GET") String verb
-    ) {
-        ClientResponse response = this.webClient.method(HttpMethod.valueOf(verb))
+            @ShellOption(help = "uri of the request", value = "L") URI uri,
+            @ShellOption(help = "http verb {GET,POST,PUT,DELETE}", value = "X", defaultValue = "GET") String verb) {
+        ClientResponse clientResponse = this.webClient.method(HttpMethod.valueOf(verb))
                 .uri(uri)
                 .accept(MediaType.ALL)
                 .exchange()
                 .block();
-        return extractAppHttpResponse(response);
+        return extractAppHttpResponse(clientResponse);
     }
 
     @ShellMethod(key = "get", prefix = "-")
     public AppHttpResponse get(
-            @ShellOption(help = "uri of the request", value = "L") String uri
-    ) {
+            @ShellOption(help = "uri of the request", value = "L") URI uri) {
        return request(uri, "GET");
     }
 
@@ -74,8 +77,7 @@ public class HttpCommands {
 
     @ShellMethod(key = "del", prefix = "-")
     public AppHttpResponse delete(
-            @ShellOption(help = "uri of the request", value = "L") String uri
-    ) {
+            @ShellOption(help = "uri of the request", value = "L") URI uri) {
         return request(uri, "DELETE");
     }
 
