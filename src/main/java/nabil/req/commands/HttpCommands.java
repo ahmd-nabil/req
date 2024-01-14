@@ -3,20 +3,16 @@ package nabil.req.commands;
 import nabil.req.domain.AppHttpResponse;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 /**
  * @author Ahmed Nabil
@@ -29,10 +25,10 @@ public class HttpCommands {
         this.webClient = webClient;
     }
 
-    @ShellMethod(key = "req", prefix = "-", value = "sends an http request")
+    @ShellMethod(key = "req", prefix = "-", value = "sends an http request, eg. req -X [http-verb] -L [URI]")
     public AppHttpResponse request(
-            @ShellOption(help = "uri of the request", value = "L") URI uri,
-            @ShellOption(help = "http verb {GET,POST,PUT,DELETE}", value = "X", defaultValue = "GET") String verb) {
+            @ShellOption(help = "http verb {GET,POST,PUT,DELETE}", value = "X", defaultValue = "GET") String verb,
+            @ShellOption(help = "uri of the request", value = "L") URI uri) {
         ClientResponse clientResponse = this.webClient.method(HttpMethod.valueOf(verb))
                 .uri(uri)
                 .accept(MediaType.ALL)
@@ -41,15 +37,15 @@ public class HttpCommands {
         return extractAppHttpResponse(clientResponse);
     }
 
-    @ShellMethod(key = "get", prefix = "-")
+    @ShellMethod(key = "get", prefix = "-", value = "eg. get http://localhost:8080")
     public AppHttpResponse get(
             @ShellOption(help = "uri of the request", value = "L") URI uri) {
-       return request(uri, "GET");
+       return request("GET", uri);
     }
 
-    @ShellMethod(key = "post", prefix = "-")
+    @ShellMethod(key = "post", prefix = "-", value = "eg. post http://localhost:8080/users -B '{\"name\":\"ahmed\", \"age\":24}'")
     public AppHttpResponse post(
-            @ShellOption(help = "uri of the request", value = "L") String uri,
+            @ShellOption(help = "uri of the request", value = "L") URI uri,
             @ShellOption(help = "body of the post request", value = "B") String body
     ) {
         ClientResponse response = this.webClient.method(HttpMethod.valueOf("POST"))
@@ -61,9 +57,9 @@ public class HttpCommands {
         return extractAppHttpResponse(response);
     }
 
-    @ShellMethod(key = "put", prefix = "-")
+    @ShellMethod(key = "put", prefix = "-", value = "eg. put http://localhost:8080/users/1 -B '{\"name\":\"Levi\", \"age\":24}'")
     public AppHttpResponse put(
-            @ShellOption(help = "uri of the request", value = "L") String uri,
+            @ShellOption(help = "uri of the request", value = "L") URI uri,
             @ShellOption(help = "body of the post request", value = "B") String body
     ) {
         ClientResponse response = this.webClient.method(HttpMethod.valueOf("PUT"))
@@ -75,10 +71,10 @@ public class HttpCommands {
         return extractAppHttpResponse(response);
     }
 
-    @ShellMethod(key = "del", prefix = "-")
+    @ShellMethod(key = "del", prefix = "-", value = "eg. del http://localhost:8080/users/1")
     public AppHttpResponse delete(
             @ShellOption(help = "uri of the request", value = "L") URI uri) {
-        return request(uri, "DELETE");
+        return request("DELETE", uri);
     }
 
     private AppHttpResponse extractAppHttpResponse(ClientResponse response) {

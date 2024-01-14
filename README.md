@@ -57,12 +57,17 @@ Choose one of the following options to start using REQ:
    type ```req``` in cmd
 
 
-5. **make HTTP requests: (local examples)**
- 
-   - For a GET request:```get http://localhost:8080```
+5. **make HTTP requests:**
+    
+   > NOTE: `http` and `localhost` are the defaults for scheme and HOST
+   - For a GET request:
+     - ```get http://localhost:8080```
+     - ```get localhost:8080```
+     - ```get :8080```
+   - For a POST request: 
+     - ```post http://localhost:8080 '{"name":"ahmed", "age":24}' ```
+   - For a Delete request: 
+     - ```del http://localhost:8080/1```
 
-   - For a POST request: ```post http://localhost:8080 '{"name":"ahmed", "age":24}' ```
-
-   - For a Delete request: ```del http://localhost:8080/1```
-
-   - For a PUT request: ```put http://localhost:8080/1 '{"name":"Ahmed", "age":22}' ```
+   - For a PUT request: 
+     - ```put http://localhost:8080/1 '{"name":"Ahmed", "age":22}' ```
