@@ -1,5 +1,6 @@
 # REQ - Spring Shell & Reactive Web Application
 
+ABDULLAH
 REQ is a versatile command-line tool inspired by `curl`, implemented using Spring Shell and Reactive Web.
 
 ## Features
@@ -28,46 +29,50 @@ Choose one of the following options to start using REQ:
    git clone https://github.com/ahmd-nabil/req.git
    cd req
    ```
+
 2. **Build and run the application with Java 17:**
 
-    ```bash
-    ./mvnw clean install
-    java -jar target/req-0.0.1-SNAPSHOT.jar
-    ```
+   ```bash
+   ./mvnw clean install
+   java -jar target/req-0.0.1-SNAPSHOT.jar
+   ```
 
-### Option 2: Using GraalVM native-image (Recommended) 
->(NOTE: GraalVM 22.3+ required) [[Getting Started]](https://www.graalvm.org/latest/docs/getting-started/)
+### Option 2: Using GraalVM native-image (Recommended)
+
+> (NOTE: GraalVM 22.3+ required) [[Getting Started]](https://www.graalvm.org/latest/docs/getting-started/)
 
 1. **Clone the repository:**
 
-    ```bash
+   ```bash
    git clone https://github.com/ahmd-nabil/req.git
    cd req
-    ```
+   ```
+
 2. **Build a native image with GraalVM:**
-    ```
-    ./mvnw native:compile -Pnative -DskipTests=true
-    ```
+   ```
+   ./mvnw native:compile -Pnative -DskipTests=true
+   ```
 3. **Add the executable path to system PATH:**
-    * on windows ```setx PATH "%PATH%;C:\path\to\req\target"```
 
+   - on windows `setx PATH "%PATH%;C:\path\to\req\target"`
 
-4. **Run the application:** 
-    
-   type ```req``` in cmd
+4. **Run the application:**
 
+   type `req` in cmd
 
 5. **make HTTP requests:**
-    
-   > NOTE: `http` and `localhost` are the defaults for scheme and HOST
-   - For a GET request:
-     - ```get http://localhost:8080```
-     - ```get localhost:8080```
-     - ```get :8080```
-   - For a POST request: 
-     - ```post http://localhost:8080 '{"name":"ahmed", "age":24}' ```
-   - For a Delete request: 
-     - ```del http://localhost:8080/1```
 
-   - For a PUT request: 
-     - ```put http://localhost:8080/1 '{"name":"Ahmed", "age":22}' ```
+   > NOTE: `http` and `localhost` are the defaults for scheme and HOST
+
+   - For a GET request:
+     - `get http://localhost:8080`
+     - `get localhost:8080`
+     - `get :8080`
+   - For a POST request:
+     - `post http://localhost:8080 '{"name":"ahmed", "age":24}' `
+   - For a Delete request:
+
+     - `del http://localhost:8080/1`
+
+   - For a PUT request:
+     - `put http://localhost:8080/1 '{"name":"Ahmed", "age":22}' `
